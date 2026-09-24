@@ -1,0 +1,318 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+    .page-main, .page-container {
+        padding: 0 !important;
+        margin: 0 !important;
+        background: transparent !important;
+        max-width: none !important;
+    }
+</style>
+
+<script>
+    /* ============================
+       데이터 및 로직
+       ============================ */
+
+    const backgroundTemplates = [
+        "책임감과 성실함을 가장 중요하게 생각하는 가정환경에서 자라며 어려움 속에서도 포기하지 않는 태도를 배웠습니다.",
+        "어릴 적부터 다양한 활동에 참여하며 도전 정신을 키워왔고, 이를 통해 문제를 스스로 해결하는 능력을 기를 수 있었습니다.",
+        "협업을 중시하는 가정 분위기 속에서 타인을 배려하며 소통하는 법을 배웠습니다.",
+        "학교와 지역 활동을 통해 다양한 사람을 만나며 열린 사고와 폭넓은 시야를 가지게 되었습니다.",
+        "꾸준히 배우고 성장하는 삶을 추구해왔으며, 이러한 태도는 제 진로 선택에도 큰 영향을 주었습니다."
+    ];
+
+    const personalityTemplates = [
+        "저는 맡은 일에 끝까지 책임감을 갖고 수행하는 성격입니다. 꼼꼼한 편이라 업무 정확도가 높다는 평가를 받습니다. 단점으로는 완벽함을 추구하다 시간이 지체되는 경우가 있어, 중요한 항목을 우선순위로 나누는 방식으로 개선하고 있습니다.",
+        "저는 새로운 사람들과 빠르게 친해지고 소통하는 능력이 장점입니다. 다만 가끔 여러 일을 동시에 맡아 일정 관리가 힘들었던 경험도 있었는데, 최근에는 일정 관리 도구를 활용하여 체계적으로 해결하고 있습니다.",
+        "문제 해결 욕구가 높아 주도적으로 업무를 추진하는 편입니다. 반면 때때로 혼자 해결하려는 경향이 있어 팀과 더 많이 소통하며 개선하고 있습니다.",
+        "성실하고 꾸준함이 제 가장 큰 장점입니다. 반면 낯선 환경 적응 속도가 느려 보일 수 있어, 새로운 업무가 주어지면 먼저 전체를 빠르게 파악하는 연습을 하고 있습니다."
+    ];
+
+    const motivationTemplates = [
+        "해당 직무는 제가 경험해온 프로젝트와 관심 분야가 잘 맞아 지원하게 되었습니다. 특히 귀사의 서비스 방향성과 성장 가능성이 제 목표와 부합한다고 느꼈습니다.",
+        "귀사는 끊임없는 혁신과 사용자 중심의 서비스 개발로 유명하기에 함께 성장하고 싶어 지원했습니다. 제가 가진 기술과 경험을 실무에 적극 활용하고 싶습니다.",
+        "학습과 실무 경험을 바탕으로 직무에 대한 흥미와 전문성을 키워왔습니다. 그 과정에서 귀사의 가치관과 업무 방향성이 제 커리어 목표와 일치한다고 판단하여 지원했습니다.",
+        "OO 분야에서 다양한 프로젝트를 수행하며 전문성을 키워 왔고, 그 경험이 귀사의 직무 요구사항과 맞아 지원하게 되었습니다."
+    ];
+
+    const futureTemplates = [
+        "입사 후에는 맡은 업무를 정확하게 수행하며 팀에 신뢰받는 구성원이 되고자 합니다. 장기적으로는 OO 분야의 전문성을 갖춘 인재로 성장하여 회사의 핵심 프로젝트에 기여하고 싶습니다.",
+        "초기에는 회사 업무 프로세스를 빠르게 익히고, 중기에는 주요 프로젝트를 주도적으로 수행할 수 있는 개발자로 성장하고자 합니다. 장기적으로는 회사의 기술 경쟁력 강화에 기여하는 인재가 되고 싶습니다.",
+        "입사 후에는 기초 업무를 탄탄히 수행하고, 꾸준한 자기 개발을 통해 OO 직무의 전문성을 발전시키고자 합니다. 장기적으로는 팀과 회사의 성장에 기여하는 핵심 인력으로 자리 잡고 싶습니다.",
+        "직무와 직접 연결된 프로젝트를 계속 수행하며 기술 역량을 키울 예정입니다. 장기적으로는 팀 리더로 성장해 조직에 기여하고 싶습니다."
+    ];
+
+    function randomPick(arr) {
+        return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    function generateText(type) {
+        let text = "";
+        let targetId = "";
+
+        if(type === 'background') {
+            text = randomPick(backgroundTemplates);
+            targetId = "backgroundBox";
+        } else if(type === 'personality') {
+            text = randomPick(personalityTemplates);
+            targetId = "personalityBox";
+        } else if(type === 'motivation') {
+            text = randomPick(motivationTemplates);
+            targetId = "motivationBox";
+        } else if(type === 'future') {
+            text = randomPick(futureTemplates);
+            targetId = "futureBox";
+        }
+
+        const el = document.getElementById(targetId);
+        el.value = text;
+
+        // 깜빡임 효과로 생성됨을 알림
+        el.classList.add("bg-purple-50", "ring-2", "ring-purple-200");
+        setTimeout(() => {
+            el.classList.remove("bg-purple-50", "ring-2", "ring-purple-200");
+        }, 500);
+    }
+
+    function copyText(id) {
+        const text = document.getElementById(id).value;
+        if (!text) return alert("복사할 내용이 없습니다.");
+        navigator.clipboard.writeText(text).then(() => {
+            alert('클립보드에 복사되었습니다!');
+        });
+    }
+
+    function toggleHelper() {
+        const helperPanel = document.getElementById('helperPanel');
+        const mainGrid = document.getElementById('mainGrid');
+        const toggleBtn = document.getElementById('toggleHelperBtn');
+
+        if (helperPanel.classList.contains('hidden')) {
+            // 패널 열기
+            helperPanel.classList.remove('hidden');
+            mainGrid.classList.add('lg:grid-cols-3'); // 2:1 비율을 위해 3열 그리드로
+
+            // 버튼 스타일 변경 (활성화)
+            toggleBtn.classList.remove('bg-yellow-50', 'text-yellow-600');
+            toggleBtn.classList.add('bg-yellow-100', 'text-yellow-700', 'ring-2', 'ring-yellow-300');
+        } else {
+            // 패널 닫기
+            helperPanel.classList.add('hidden');
+            mainGrid.classList.remove('lg:grid-cols-3');
+
+            // 버튼 스타일 변경 (비활성화)
+            toggleBtn.classList.add('bg-yellow-50', 'text-yellow-600');
+            toggleBtn.classList.remove('bg-yellow-100', 'text-yellow-700', 'ring-2', 'ring-yellow-300');
+        }
+    }
+
+    function goWriteCoverLetter() {
+        const bg = document.getElementById("backgroundBox").value.trim();
+        const ps = document.getElementById("personalityBox").value.trim();
+        const mt = document.getElementById("motivationBox").value.trim();
+        const ft = document.getElementById("futureBox").value.trim();
+
+        if (!bg && !ps && !mt && !ft) {
+            alert("작성된 내용이 없습니다!");
+            return;
+        }
+
+        const title = prompt("자기소개서 제목을 입력하세요:", "새 자기소개서");
+        if (!title) return;
+
+        localStorage.setItem("cl_auto_title", title);
+        localStorage.setItem("cl_auto_background", bg);
+        localStorage.setItem("cl_auto_strengths", ps);
+        localStorage.setItem("cl_auto_motivation", mt);
+        localStorage.setItem("cl_auto_future", ft);
+
+        location.href = "/coverletter/new?from=auto";
+    }
+</script>
+
+<div class="min-h-screen bg-[#F3F4F6] py-12">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-10">
+            <h1 class="text-2xl font-bold text-gray-900 mb-2">AI 자기소개서 생성 도우미</h1>
+            <p class="text-gray-500">AI와 함께 나만의 자기소개서를 완성해보세요.</p>
+        </div>
+        <div class="mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div class="flex items-center gap-4">
+                <button onclick="history.back()" class="inline-flex items-center gap-2 text-gray-500 hover:text-purple-700 transition font-medium">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M15 19l-7-7 7-7"></path>
+                    </svg>
+                    뒤로 가기
+                </button>
+            </div>
+
+            <div class="flex items-center gap-3 w-full sm:w-auto">
+                <button id="toggleHelperBtn" onclick="toggleHelper()"
+                        class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 bg-yellow-50 text-yellow-600 font-bold rounded-xl hover:bg-yellow-100 transition shadow-sm text-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548 5.478a1 1 0 01-1.724 0L9 15.657z" />
+                    </svg>
+                    <span>작성 팁 보기</span>
+                </button>
+
+                <button onclick="goWriteCoverLetter()"
+                        class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-6 py-2.5 bg-purple-600 text-white font-bold rounded-xl hover:bg-purple-700 transition shadow-md hover:-translate-y-0.5 transform">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span>작성 완료</span>
+                </button>
+            </div>
+        </div>
+
+        <div id="mainGrid" class="grid grid-cols-1 gap-6 transition-all duration-300">
+
+            <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 p-8 sm:p-10">
+                <div class="mb-8">
+                    <h2 class="text-xl font-bold text-gray-900 mb-2">문장 자동 생성</h2>
+                    <p class="text-gray-500 text-sm">AI가 추천하는 문장을 조합하여 나만의 자기소개서 초안을 만들어보세요.</p>
+                </div>
+
+                <div class="space-y-10">
+
+                    <div>
+                        <div class="flex justify-between items-end mb-3">
+                            <label class="block text-sm font-bold text-gray-900 flex items-center gap-2">
+                                <span class="w-1 h-4 bg-purple-500 rounded-full"></span> 성장 배경
+                            </label>
+                            <div class="flex gap-2">
+                                <button onclick="generateText('background')" class="flex items-center gap-1.5 px-3 py-1.5 bg-purple-50 text-purple-600 rounded-lg hover:bg-purple-100 transition text-xs font-bold border border-purple-100">
+                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                                    자동 생성
+                                </button>
+                                <button onclick="copyText('backgroundBox')" class="p-1.5 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition border border-transparent hover:border-gray-200" title="복사">
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+                                </button>
+                            </div>
+                        </div>
+                        <textarea id="backgroundBox" rows="4" placeholder="예) 책임감을 중요하게 생각하는 가정환경에서 자라며..."
+                                  class="w-full px-5 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-purple-500 outline-none transition resize-none leading-relaxed"></textarea>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between items-end mb-3">
+                            <label class="block text-sm font-bold text-gray-900 flex items-center gap-2">
+                                <span class="w-1 h-4 bg-purple-500 rounded-full"></span> 성격의 장단점
+                            </label>
+                            <div class="flex gap-2">
+                                <button onclick="generateText('personality')" class="flex items-center gap-1.5 px-3 py-1.5 bg-purple-50 text-purple-600 rounded-lg hover:bg-purple-100 transition text-xs font-bold border border-purple-100">
+                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                                    자동 생성
+                                </button>
+                                <button onclick="copyText('personalityBox')" class="p-1.5 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition border border-transparent hover:border-gray-200" title="복사">
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+                                </button>
+                            </div>
+                        </div>
+                        <textarea id="personalityBox" rows="4" placeholder="- 장점: &#10;- 단점: &#10;- 극복 경험:"
+                                  class="w-full px-5 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-purple-500 outline-none transition resize-none leading-relaxed"></textarea>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between items-end mb-3">
+                            <label class="block text-sm font-bold text-gray-900 flex items-center gap-2">
+                                <span class="w-1 h-4 bg-purple-500 rounded-full"></span> 지원 동기
+                            </label>
+                            <div class="flex gap-2">
+                                <button onclick="generateText('motivation')" class="flex items-center gap-1.5 px-3 py-1.5 bg-purple-50 text-purple-600 rounded-lg hover:bg-purple-100 transition text-xs font-bold border border-purple-100">
+                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                                    자동 생성
+                                </button>
+                                <button onclick="copyText('motivationBox')" class="p-1.5 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition border border-transparent hover:border-gray-200" title="복사">
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+                                </button>
+                            </div>
+                        </div>
+                        <textarea id="motivationBox" rows="4" placeholder="예) OO 기업의 △△ 직무는 제가 가진 경험과 잘 맞습니다."
+                                  class="w-full px-5 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-purple-500 outline-none transition resize-none leading-relaxed"></textarea>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between items-end mb-3">
+                            <label class="block text-sm font-bold text-gray-900 flex items-center gap-2">
+                                <span class="w-1 h-4 bg-purple-500 rounded-full"></span> 입사 후 포부
+                            </label>
+                            <div class="flex gap-2">
+                                <button onclick="generateText('future')" class="flex items-center gap-1.5 px-3 py-1.5 bg-purple-50 text-purple-600 rounded-lg hover:bg-purple-100 transition text-xs font-bold border border-purple-100">
+                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                                    자동 생성
+                                </button>
+                                <button onclick="copyText('futureBox')" class="p-1.5 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition border border-transparent hover:border-gray-200" title="복사">
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+                                </button>
+                            </div>
+                        </div>
+                        <textarea id="futureBox" rows="4" placeholder="예) 입사 후 OO분야의 전문성을 키워..."
+                                  class="w-full px-5 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-purple-500 outline-none transition resize-none leading-relaxed"></textarea>
+                    </div>
+
+                </div>
+            </div>
+
+            <div id="helperPanel" class="hidden">
+                <div class="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-2xl shadow-sm border border-yellow-100 p-8 sticky top-24">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm text-yellow-500">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548 5.478a1 1 0 01-1.724 0L9 15.657z" />
+                            </svg>
+                        </div>
+                        <h2 class="text-xl font-bold text-gray-900">작성 도우미</h2>
+                    </div>
+
+                    <div class="space-y-6">
+                        <div class="bg-white/80 rounded-xl p-5 shadow-sm border border-yellow-100/50 backdrop-blur-sm">
+                            <h3 class="text-yellow-800 font-bold mb-3 flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>
+                                작성 팁
+                            </h3>
+                            <ul class="space-y-2 text-gray-700 text-sm">
+                                <li>• 구체적인 경험과 사례를 포함하세요</li>
+                                <li>• 숫자와 데이터로 성과를 표현하세요</li>
+                                <li>• 기업의 가치관과 연결 지으세요</li>
+                                <li>• 진솔하고 솔직한 이야기를 담으세요</li>
+                            </ul>
+                        </div>
+
+                        <div class="bg-white/80 rounded-xl p-5 shadow-sm border border-yellow-100/50 backdrop-blur-sm">
+                            <h3 class="text-yellow-800 font-bold mb-3 flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z"></path></svg>
+                                사용 방법
+                            </h3>
+                            <ol class="space-y-2 text-gray-700 text-sm list-decimal list-inside marker:text-yellow-500 marker:font-bold">
+                                <li>각 항목의 <span class="text-purple-600 font-bold">'자동 생성'</span> 버튼 클릭</li>
+                                <li>생성된 문구를 참고하여 내용 수정</li>
+                                <li>본인의 실제 경험으로 구체화</li>
+                                <li><span class="text-gray-900 font-bold">'작성 완료'</span> 버튼을 눌러 저장</li>
+                            </ol>
+                        </div>
+
+                        <div class="bg-red-50 rounded-xl p-5 border border-red-100">
+                            <h3 class="text-red-800 font-bold mb-2 text-sm flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                                주의사항
+                            </h3>
+                            <p class="text-red-700 text-xs leading-relaxed">
+                                자동 생성된 내용은 단순 예시입니다.<br>
+                                그대로 제출하지 마시고, 반드시 본인의 상황에 맞게 수정하여 사용해 주세요.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}

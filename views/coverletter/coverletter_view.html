@@ -1,0 +1,157 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+    .page-main, .page-container {
+        padding: 0 !important;
+        margin: 0 !important;
+        background: transparent !important;
+        max-width: none !important;
+    }
+</style>
+
+<div class="min-h-screen bg-[#F3F4F6] py-12">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8" id="clContainer">
+        <div class="flex flex-col items-center justify-center py-20">
+            <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-purple-600 mb-4"></div>
+            <p class="text-gray-500">자기소개서를 불러오는 중입니다...</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    // URL에서 ID 추출 로직
+    const pathParts = window.location.pathname.split("/");
+    const id = pathParts[pathParts.length - 1];
+
+    if (!id) {
+        document.getElementById("clContainer").innerHTML =
+            `<div class='text-center py-20 text-gray-500'>잘못된 접근입니다.</div>`;
+    } else {
+        loadCoverLetter(id);
+    }
+
+    // 섹션 데이터 추출 함수
+    function getSectionContent(sections, type) {
+        const found = sections.find(s => s.section_type === type);
+        return found ? (found.content || "") : "";
+    }
+
+    // HTML 렌더링 함수
+    function renderCoverLetter(container, data) {
+        const cl = data.coverLetter;
+        const sections = data.sections || [];
+
+        const background = getSectionContent(sections, "background");
+        const strengths  = getSectionContent(sections, "strengths");
+        const motivation = getSectionContent(sections, "motivation");
+        const future     = getSectionContent(sections, "future");
+
+        // 섹션 HTML 생성 헬퍼
+        const createSectionHtml = (title, content) => {
+            return `
+                <div class="py-8 border-t border-gray-100 first:border-0 first:pt-0">
+                    <h2 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 bg-purple-500 rounded-full"></span>
+                        ${title}
+                    </h2>
+                    <div class="text-gray-700 leading-relaxed whitespace-pre-wrap break-words pl-3.5 border-l-2 border-gray-100 ml-0.5 min-h-[60px]">${content || "<span class='text-gray-400'>작성된 내용이 없습니다.</span>"}</div>
+                </div>
+            `;
+        };
+
+        container.innerHTML = `
+            <div class="mb-6 flex justify-between items-center">
+                <a href="/user/mypage" class="inline-flex items-center gap-2 text-gray-500 hover:text-purple-700 transition font-medium">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M15 19l-7-7 7-7"></path>
+                    </svg>
+                    목록으로
+                </a>
+
+                <div class="flex gap-2">
+                    <button onclick="downloadPDF(${cl.id})" class="px-4 py-2 bg-white border border-gray-200 text-gray-700 font-bold rounded-lg hover:bg-gray-50 hover:text-purple-600 transition shadow-sm text-sm">
+                        PDF 저장
+                    </button>
+
+                    <a href="/coverletter/edit/${cl.id}" class="px-4 py-2 bg-white border border-gray-200 text-gray-700 font-bold rounded-lg hover:bg-gray-50 hover:text-purple-600 transition shadow-sm text-sm">
+                        수정하기
+                    </a>
+                    <button onclick="deleteCL(${cl.id})" class="px-4 py-2 bg-white border border-gray-200 text-red-500 font-bold rounded-lg hover:bg-red-50 hover:border-red-100 transition shadow-sm text-sm">
+                        삭제
+                    </button>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+
+                <div class="p-8 sm:p-10 border-b border-gray-50 bg-white">
+                    <span class="inline-block px-3 py-1 bg-purple-50 text-purple-600 text-xs font-bold rounded-full mb-3">자기소개서</span>
+                    <h1 class="text-3xl font-bold text-gray-900 leading-tight">${cl.title}</h1>
+                    <p class="text-gray-400 text-sm mt-2">작성일: ${cl.created_at ? new Date(cl.created_at).toLocaleDateString() : '-'}</p>
+                </div>
+
+                <div class="p-8 sm:p-10 space-y-2">
+                    ${createSectionHtml("성장배경", background)}
+                    ${createSectionHtml("성격의 장단점", strengths)}
+                    ${createSectionHtml("지원동기", motivation)}
+                    ${createSectionHtml("입사 후 포부", future)}
+                </div>
+
+            </div>
+        `;
+    }
+
+    // PDF 다운로드 함수
+    function downloadPDF(id) {
+        window.open(`/coverletter/${id}/pdf`, "_blank");
+    }
+
+    // 삭제 함수
+    async function deleteCL(id) {
+        if (!confirm("정말 자기소개서를 삭제하시겠습니까?\n삭제된 데이터는 복구할 수 없습니다.")) return;
+
+        try {
+            const res = await fetch(`/api/coverletters/${id}`, { method: "DELETE" });
+            if (res.ok) {
+                alert("삭제되었습니다.");
+                location.href = "/user/mypage";
+            } else {
+                const data = await res.json();
+                alert("삭제 실패: " + (data.message || "오류가 발생했습니다."));
+            }
+        } catch (err) {
+            console.error(err);
+            alert("서버 통신 오류가 발생했습니다.");
+        }
+    }
+
+    // 데이터 로드 함수
+    async function loadCoverLetter(id) {
+        const container = document.getElementById("clContainer");
+
+        try {
+            const res = await fetch(`/api/coverletters/${id}`);
+            const data = await res.json();
+
+            if (!res.ok) {
+                container.innerHTML = `
+                    <div class="bg-white rounded-2xl shadow-sm p-10 text-center">
+                        <p class="text-gray-500 mb-4">${data.message || "자기소개서를 찾을 수 없습니다."}</p>
+                        <a href="/user/mypage" class="text-purple-600 font-bold hover:underline">목록으로 돌아가기</a>
+                    </div>`;
+                return;
+            }
+
+            renderCoverLetter(container, data);
+        } catch (err) {
+            console.error(err);
+            container.innerHTML = `<div class='text-center py-20 text-red-500'>데이터를 불러오는 중 오류가 발생했습니다.</div>`;
+        }
+    }
+</script>
+
+{% endblock %}

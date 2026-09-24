@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <title>Resume PDF</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <style>
+        /* PDF 출력을 위한 A4 사이즈 고정 */
+        body {
+            background: #525659; /* PDF 뷰어 같은 배경색 */
+            display: flex;
+            justify-content: center;
+            padding: 40px;
+            font-family: 'Pretendard', 'Arial', sans-serif;
+        }
+        .a4-page {
+            width: 210mm;
+            min-height: 297mm;
+            background: white;
+            padding: 15mm;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            box-sizing: border-box;
+        }
+        /* PDF 변환 시 페이지 넘김 처리 */
+        .section {
+            page-break-inside: avoid;
+        }
+    </style>
+</head>
+<body>
+
+<div class="a4-page" id="pdf-area">
+    <div class="flex items-center justify-center h-full text-gray-400">
+        데이터를 불러오는 중...
+    </div>
+</div>
+
+<script>
+    /* URL에서 RESUME ID 추출 */
+    let resumeId;
+    const parts = window.location.pathname.split("/");
+    if (parts.length >= 3) {
+        resumeId = parts[2];
+    }
+
+    if (!resumeId || isNaN(resumeId)) {
+        document.getElementById("pdf-area").innerHTML = "<p>잘못된 접근입니다.</p>";
+        throw new Error("resumeId 없음");
+    }
+
+    function getSectionContent(sections, type) {
+        const found = sections.find(s => s.section_type === type);
+        return found ? (found.content || "") : "";
+    }
+
+    function renderResume(container, data) {
+        const resume = data.resume;
+        const sections = data.sections || [];
+
+        const summary     = getSectionContent(sections, "summary");
+        const education   = getSectionContent(sections, "education");
+        const internships = getSectionContent(sections, "internships");
+        const projects    = getSectionContent(sections, "projects");
+        const awards      = getSectionContent(sections, "awards");
+        const activities  = getSectionContent(sections, "activities");
+        const skills      = getSectionContent(sections, "skills");
+        const others      = getSectionContent(sections, "others");
+
+        const githubLink = resume.github_id ? `github.com/${resume.github_id}` : "";
+        const profileImg = resume.profile_image_url || "/default-profile.png";
+
+        // 섹션 HTML 생성 헬퍼
+        const createSection = (title, content) => {
+            if (!content) return "";
+            return `
+                <div class="section mt-8">
+                    <h2 class="text-lg font-bold text-purple-800 border-b-2 border-purple-100 pb-2 mb-3 flex items-center gap-2">
+                        <span class="w-2 h-2 bg-purple-600 rounded-full"></span> ${title}
+                    </h2>
+                    <div class="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap break-words pl-2">${content}</div>
+                </div>
+            `;
+        };
+
+        container.innerHTML = `
+            <div class="flex gap-6 items-start border-b border-gray-200 pb-8">
+                <div class="w-32 h-32 flex-shrink-0 rounded-xl overflow-hidden border border-gray-200">
+                    <img src="${profileImg}" class="w-full h-full object-cover" alt="Profile">
+                </div>
+
+                <div class="flex-1 pt-1">
+                    <h1 class="text-3xl font-extrabold text-gray-900 mb-2">${resume.name || "이름 없음"}</h1>
+                    <p class="text-lg text-purple-600 font-bold mb-4">${resume.resume_title || "제목 없음"}</p>
+
+                    <div class="grid grid-cols-2 gap-y-1 gap-x-4 text-sm text-gray-600">
+                        ${resume.email ? `<div class="flex items-center gap-2">📧 ${resume.email}</div>` : ""}
+                        ${resume.telephone ? `<div class="flex items-center gap-2">📱 ${resume.telephone}</div>` : ""}
+                        ${githubLink ? `<div class="flex items-center gap-2 col-span-2">💻 ${githubLink}</div>` : ""}
+                    </div>
+                </div>
+            </div>
+
+            ${summary ? `
+                <div class="section mt-8 bg-gray-50 p-5 rounded-lg border border-gray-100">
+                    <h3 class="text-sm font-bold text-gray-500 uppercase mb-2">Summary</h3>
+                    <p class="text-sm text-gray-800 leading-relaxed whitespace-pre-wrap break-words">${summary}</p>
+                </div>
+            ` : ""}
+
+            ${createSection("학력 Education", education)}
+            ${createSection("인턴십 Internships", internships)}
+            ${createSection("프로젝트 Projects", projects)}
+            ${createSection("기술 및 어학 Skills", skills)}
+            ${createSection("수상 경력 Awards", awards)}
+            ${createSection("대외 활동 Activities", activities)}
+            ${createSection("기타 Others", others)}
+        `;
+    }
+
+    async function loadResumeAndPdf() {
+        try {
+            const res = await fetch(`/api/resumes/${resumeId}`, { credentials: "include" });
+            const data = await res.json();
+
+            if (!res.ok) {
+                document.getElementById("pdf-area").innerHTML = `<p class="text-red-500 text-center mt-10">정보를 불러오지 못했습니다.</p>`;
+                return;
+            }
+
+            renderResume(document.getElementById("pdf-area"), data);
+
+            // PDF 생성 (약간의 지연 시간 후 실행)
+            setTimeout(() => {
+                const element = document.getElementById("pdf-area");
+                const opt = {
+                    margin: 0,
+                    filename: `${data.resume.name || 'resume'}_이력서.pdf`,
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2, useCORS: true },
+                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                };
+                html2pdf()
+                    .set(opt)
+                    .from(element)
+                    .save()
+                    .then(() => {
+                        window.close();
+                    })
+                    .catch((err) => console.error("PDF 생성 실패:", err));
+            }, 800);
+
+        } catch (err) {
+            console.error(err);
+            document.getElementById("pdf-area").innerHTML = "<p>오류가 발생했습니다.</p>";
+        }
+    }
+
+    loadResumeAndPdf();
+</script>
+
+</body>
+</html>

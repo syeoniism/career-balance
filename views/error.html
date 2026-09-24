@@ -1,0 +1,10 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<h2>에러 발생</h2>
+<p>{{ message }}</p>
+
+{% if error and error.stack %}
+<pre>{{ error.stack }}</pre>
+{% endif %}
+{% endblock %}

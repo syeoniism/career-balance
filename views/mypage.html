@@ -1,0 +1,270 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+    .page-main, .page-container {
+        padding: 0 !important;
+        margin: 0 !important;
+        max-width: none !important;
+        background: transparent !important;
+    }
+</style>
+
+<div class="min-h-screen bg-[#F3F4F6] py-12">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        <div class="mb-10">
+            <h1 class="text-3xl font-bold text-gray-900">
+                <span class="text-purple-600">{{ user.nickname }}</span>님의 마이페이지
+            </h1>
+            <p class="text-gray-500 mt-2 text-sm">내 활동 기록과 이력서를 관리해보세요.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+            <section class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col h-full">
+                <div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between bg-gray-50">
+                    <h2 class="font-bold text-gray-800 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                        내 이력서
+                    </h2>
+                    <a href="/resume/new" class="text-xs font-bold text-indigo-600 hover:text-indigo-800 bg-indigo-50 px-3 py-1.5 rounded-lg hover:bg-indigo-100 transition">
+                        + 새로 만들기
+                    </a>
+                </div>
+
+                <div id="resumeList" class="divide-y divide-gray-100 flex-1">
+                    <div class="p-6 text-center text-gray-400 text-sm">로딩 중...</div>
+                </div>
+            </section>
+
+            <section class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col h-full">
+                <div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between bg-gray-50">
+                    <h2 class="font-bold text-gray-800 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                        </svg>
+                        내 자기소개서
+                    </h2>
+                    <a href="/coverletter/new" class="text-xs font-bold text-green-600 hover:text-green-800 bg-green-50 px-3 py-1.5 rounded-lg hover:bg-green-100 transition">
+                        + 새로 만들기
+                    </a>
+                </div>
+
+                <div id="clList" class="divide-y divide-gray-100 flex-1">
+                    <div class="p-6 text-center text-gray-400 text-sm">로딩 중...</div>
+                </div>
+            </section>
+        </div>
+
+
+        <section class="mb-8">
+            <h2 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <span class="w-1.5 h-6 bg-purple-500 rounded-full"></span>
+                내가 쓴 글
+            </h2>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                {% if myPosts | length == 0 %}
+                <div class="p-10 text-center">
+                    <p class="text-gray-400 mb-2">작성한 글이 없습니다.</p>
+                    <a href="/post" class="text-sm text-purple-600 font-bold hover:underline">첫 글 작성하러 가기</a>
+                </div>
+                {% else %}
+                <div class="divide-y divide-gray-100">
+                    {% for p in myPosts %}
+                    <a href="/post/{{ p.id }}" class="block p-5 hover:bg-purple-50 transition group">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3 overflow-hidden">
+                                <span class="flex-shrink-0 px-2 py-0.5 rounded text-[10px] font-bold border
+                                    {% if p.type == 'balance' %} bg-purple-50 text-purple-600 border-purple-100
+                                    {% else %} bg-gray-50 text-gray-500 border-gray-200 {% endif %}">
+                                    {% if p.type == 'balance' %}투표{% else %}일반{% endif %}
+                                </span>
+                                <h3 class="text-gray-900 font-medium truncate group-hover:text-purple-700 transition">{{ p.title }}</h3>
+                            </div>
+                            <span class="text-xs text-gray-400 whitespace-nowrap ml-4 font-mono">{{ p.created_at }}</span>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </section>
+
+
+        <section class="mb-12">
+            <h2 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <span class="w-1.5 h-6 bg-blue-500 rounded-full"></span>
+                내가 투표한 글
+            </h2>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                {% if votedBalancePosts | length == 0 %}
+                <div class="p-10 text-center text-gray-400">
+                    아직 참여한 투표가 없습니다.
+                </div>
+                {% else %}
+                <div class="divide-y divide-gray-100">
+                    {% for p in votedBalancePosts %}
+                    <a href="/post/{{ p.id }}" class="block p-5 hover:bg-blue-50 transition group">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3 overflow-hidden">
+                                <span class="flex-shrink-0 px-2 py-0.5 bg-blue-50 text-blue-600 border border-blue-100 rounded text-[10px] font-bold">
+                                    참여완료
+                                </span>
+                                <h3 class="text-gray-900 font-medium truncate group-hover:text-blue-700 transition">{{ p.title }}</h3>
+                                <span class="text-xs text-gray-400 group-hover:text-blue-500 transition">
+                                    (나의 선택: <span class="font-bold">{{ p.option_label }}</span>)
+                                </span>
+                            </div>
+                            <span class="text-xs text-gray-400 whitespace-nowrap ml-4 font-mono">{{ p.created_at }}</span>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<script>
+    // 공통 아이콘 SVG 문자열 (재사용)
+    const icons = {
+        edit: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>',
+        pdf: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>',
+        link: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>',
+        eye: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>',
+        eyeOff: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path></svg>',
+        trash: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>'
+    };
+
+    async function loadResumes() {
+        const box = document.getElementById("resumeList");
+        const res = await fetch("/api/resumes/my");
+        if (!res.ok) return (box.innerHTML = "<p class='p-6 text-sm text-red-500'>목록을 불러오지 못했습니다.</p>");
+        const list = await res.json();
+
+        box.innerHTML = "";
+
+        if (list.length === 0) {
+            box.innerHTML = `<div class="p-8 text-center text-gray-400 text-sm">작성된 이력서가 없습니다.</div>`;
+            return;
+        }
+
+        list.forEach(r => {
+            const date = r.updated_at?.split("T")[0] || "-";
+
+            box.innerHTML += `
+            <div class="p-5 hover:bg-gray-50 transition flex items-center justify-between group">
+                <div class="min-w-0">
+                    <a href="/resume/${r.id}" class="text-gray-900 font-bold text-base hover:text-indigo-600 transition truncate block mb-1">
+                        ${r.title}
+                    </a>
+                    <p class="text-gray-400 text-xs font-mono">${date}</p>
+                </div>
+
+                <div class="flex items-center gap-1 pl-4 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                    <a href="/resume/${r.id}/edit" class="p-2 rounded-lg text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 transition" title="수정">${icons.edit}</a>
+                    <button onclick="downloadPDF(${r.id})" class="p-2 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition" title="PDF 다운">${icons.pdf}</button>
+                    <button onclick="copyShareURL(${r.id})" class="p-2 rounded-lg transition ${r.is_public ? 'text-green-500 hover:bg-green-50' : 'text-gray-300 cursor-not-allowed'}" ${r.is_public ? "" : "disabled"} title="링크 복사">${icons.link}</button>
+                    <button onclick="toggleResumePublic(${r.id}, ${r.is_public})" class="p-2 rounded-lg transition ${r.is_public ? 'text-blue-500 hover:bg-blue-50' : 'text-gray-400 hover:bg-gray-100'}" title="공개 여부 변경">
+                        ${r.is_public ? icons.eye : icons.eyeOff}
+                    </button>
+                    <button onclick="deleteResume(${r.id})" class="p-2 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition" title="삭제">${icons.trash}</button>
+                </div>
+            </div>`;
+        });
+    }
+
+    async function loadCoverLetters() {
+        const box = document.getElementById("clList");
+        const res = await fetch("/api/coverletters/my");
+        if (!res.ok) return (box.innerHTML = "<p class='p-6 text-sm text-red-500'>목록을 불러오지 못했습니다.</p>");
+        const list = await res.json();
+
+        box.innerHTML = "";
+
+        if (list.length === 0) {
+            box.innerHTML = `<div class="p-8 text-center text-gray-400 text-sm">작성된 자기소개서가 없습니다.</div>`;
+            return;
+        }
+
+        list.forEach(c => {
+            const date = c.updated_at?.split("T")[0] || "-";
+
+            box.innerHTML += `
+            <div class="p-5 hover:bg-gray-50 transition flex items-center justify-between group">
+                <div class="min-w-0">
+                    <a href="/coverletter/view/${c.id}" class="text-gray-900 font-bold text-base hover:text-green-600 transition truncate block mb-1">
+                        ${c.title}
+                    </a>
+                    <p class="text-gray-400 text-xs font-mono">${date}</p>
+                </div>
+
+                <div class="flex items-center gap-1 pl-4 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                    <a href="/coverletter/edit/${c.id}" class="p-2 rounded-lg text-gray-400 hover:text-green-600 hover:bg-green-50 transition" title="수정">${icons.edit}</a>
+                    <button onclick="downloadCLPDF(${c.id})" class="p-2 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition" title="PDF 다운">${icons.pdf}</button>
+                    <button onclick="copyCLShareURL(${c.id})" class="p-2 rounded-lg transition ${c.is_public ? 'text-green-500 hover:bg-green-50' : 'text-gray-300 cursor-not-allowed'}" ${c.is_public ? "" : "disabled"} title="링크 복사">${icons.link}</button>
+                    <button onclick="toggleCLPublic(${c.id}, ${c.is_public})" class="p-2 rounded-lg transition ${c.is_public ? 'text-blue-500 hover:bg-blue-50' : 'text-gray-400 hover:bg-gray-100'}" title="공개 여부 변경">
+                        ${c.is_public ? icons.eye : icons.eyeOff}
+                    </button>
+                    <button onclick="deleteCoverLetter(${c.id})" class="p-2 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition" title="삭제">${icons.trash}</button>
+                </div>
+            </div>`;
+        });
+    }
+
+    async function toggleResumePublic(id, currentStatus) {
+        const action = currentStatus ? "private" : "public";
+        await fetch(`/api/resumes/${id}/${action}`, { method: "PATCH" });
+        loadResumes();
+    }
+
+    async function toggleCLPublic(id, currentStatus) {
+        const action = currentStatus ? "private" : "public";
+        await fetch(`/api/coverletters/${id}/${action}`, { method: "PATCH" });
+        loadCoverLetters();
+    }
+
+    async function deleteResume(id) {
+        if (!confirm("정말 삭제하시겠습니까?")) return;
+        await fetch(`/api/resumes/${id}`, { method: "DELETE" });
+        loadResumes();
+    }
+
+    async function deleteCoverLetter(id) {
+        if (!confirm("정말 삭제하시겠습니까?")) return;
+        await fetch(`/api/coverletters/${id}`, { method: "DELETE" });
+        loadCoverLetters();
+    }
+
+    function downloadPDF(id) { window.open(`/resume/${id}/pdf`, "_blank"); }
+    function downloadCLPDF(id) { window.open(`/coverletter/${id}/pdf`, "_blank"); }
+
+    async function copyShareURL(id) {
+        const res = await fetch(`/api/resumes/${id}/public`, { method: "PATCH" });
+        const data = await res.json();
+        if (!res.ok) return alert(data.message || "URL 생성 실패");
+        await navigator.clipboard.writeText(data.share_url);
+        alert("🔗 링크가 복사되었습니다!");
+    }
+
+    async function copyCLShareURL(id) {
+        const res = await fetch(`/api/coverletters/${id}/public`, { method: "PATCH" });
+        const data = await res.json();
+        if (!res.ok) return alert(data.message || "URL 생성 실패");
+        await navigator.clipboard.writeText(data.share_url);
+        alert("🔗 링크가 복사되었습니다!");
+    }
+
+    loadResumes();
+    loadCoverLetters();
+</script>
+
+{% endblock %}

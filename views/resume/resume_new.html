@@ -1,0 +1,252 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+    .page-main, .page-container {
+        padding: 0 !important;
+        margin: 0 !important;
+        background: transparent !important;
+        max-width: none !important;
+    }
+</style>
+
+<div class="min-h-screen bg-[#F3F4F6] py-12">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-10">
+            <h1 class="text-2xl font-bold text-gray-900 mb-2">이력서 작성하기</h1>
+        </div>
+
+        <div class="mb-6 flex justify-between items-center">
+            <button onclick="history.back()" class="inline-flex items-center gap-2 text-gray-500 hover:text-purple-700 transition font-medium">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M15 19l-7-7 7-7"></path>
+                </svg>
+                뒤로 가기
+            </button>
+
+            <button type="button" onclick="document.getElementById('newForm').dispatchEvent(new Event('submit', {cancelable: true, bubbles: true}))"
+                    class="sm:hidden flex items-center gap-1 px-4 py-2 bg-purple-600 text-white text-sm font-bold rounded-lg shadow-sm">
+                저장
+            </button>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 sm:p-10">
+
+            <form id="newForm" enctype="multipart/form-data" class="space-y-8">
+
+                <div class="flex flex-col md:flex-row gap-8">
+                    <div class="flex-shrink-0 flex flex-col items-center">
+                        <label class="block text-sm font-bold text-gray-700 mb-2">프로필 사진</label>
+                        <div class="relative group cursor-pointer w-32 h-40 bg-gray-100 rounded-xl overflow-hidden border-2 border-dashed border-gray-300 hover:border-purple-400 transition flex items-center justify-center">
+                            <img id="profilePreview" class="absolute inset-0 w-full h-full object-cover hidden" />
+                            <div class="text-center p-2 text-gray-400 group-hover:text-purple-500 transition">
+                                <svg class="w-8 h-8 mx-auto mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                <span class="text-xs font-bold">사진 추가</span>
+                            </div>
+                            <input type="file" id="profile_image" name="profile_image" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" />
+                        </div>
+                    </div>
+
+                    <div class="flex-1 space-y-4">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">이력서 제목 <span class="text-red-500">*</span></label>
+                            <input name="resume_title" id="resume_title" required placeholder="예: 열정적인 신입 프론트엔드 개발자"
+                                   class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-purple-500 outline-none transition" />
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 mb-1">이름 <span class="text-red-500">*</span></label>
+                                <input name="name" id="name" required placeholder="홍길동"
+                                       class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-purple-500 outline-none transition" />
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 mb-1">전화번호</label>
+                                <input name="telephone" id="telephone" placeholder="010-1234-5678"
+                                       class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-purple-500 outline-none transition" />
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 mb-1">이메일</label>
+                                <input name="email" id="email" type="email" placeholder="example@email.com"
+                                       class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-purple-500 outline-none transition" />
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 mb-1">GitHub ID</label>
+                                <div class="relative">
+                                    <span class="absolute left-4 top-3.5 text-gray-400 text-sm">github.com/</span>
+                                    <input name="github_id" id="github_id" placeholder="username"
+                                           class="w-full pl-24 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-purple-500 outline-none transition" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="border-gray-100" />
+
+                <div class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-900 mb-2 flex items-center gap-2">
+                            <span class="w-1 h-4 bg-purple-500 rounded-full"></span> 요약 (Summary)
+                        </label>
+                        <textarea name="summary" id="summary" rows="4" placeholder="본인의 강점과 직무에 대한 열정을 3-4줄로 요약해서 작성해주세요."
+                                  class="w-full px-5 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-purple-500 outline-none transition resize-none"></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold text-gray-900 mb-2 flex items-center gap-2">
+                            <span class="w-1 h-4 bg-purple-500 rounded-full"></span> 학력 (Education)
+                        </label>
+                        <textarea name="education" id="education" rows="4" placeholder="학교명, 전공, 입학/졸업년월 등을 자유롭게 작성해주세요."
+                                  class="w-full px-5 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-purple-500 outline-none transition resize-none"></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold text-gray-900 mb-2 flex items-center gap-2">
+                            <span class="w-1 h-4 bg-purple-500 rounded-full"></span> 인턴십 & 경력 (Experience)
+                        </label>
+                        <textarea name="internships" id="internships" rows="7" placeholder="회사/기관명, 기간, 주요 업무 및 성과를 작성해주세요."
+                                  class="w-full px-5 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-purple-500 outline-none transition resize-none"></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold text-gray-900 mb-2 flex items-center gap-2">
+                            <span class="w-1 h-4 bg-purple-500 rounded-full"></span> 프로젝트 경험 (Projects)
+                        </label>
+                        <textarea name="projects" id="projects" rows="7" placeholder="프로젝트명, 역할, 사용 기술, 주요 기능 등을 작성해주세요."
+                                  class="w-full px-5 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-purple-500 outline-none transition resize-none"></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold text-gray-900 mb-2 flex items-center gap-2">
+                            <span class="w-1 h-4 bg-purple-500 rounded-full"></span> 스킬 & 어학 (Skills)
+                        </label>
+                        <textarea name="skills" id="skills" rows="4" placeholder="Java, Python, React, TOEIC 900 등 보유 기술과 자격증을 나열해주세요."
+                                  class="w-full px-5 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-purple-500 outline-none transition resize-none"></textarea>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-900 mb-2">수상 경력 (Awards)</label>
+                            <textarea name="awards" id="awards" rows="3" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-purple-500 outline-none transition resize-none"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-900 mb-2">대외 활동 (Activities)</label>
+                            <textarea name="activities" id="activities" rows="3" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-purple-500 outline-none transition resize-none"></textarea>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold text-gray-900 mb-2">기타 (Others)</label>
+                        <textarea name="others" id="others" rows="3" class="w-full px-5 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-purple-500 outline-none transition resize-none"></textarea>
+                    </div>
+                </div>
+
+                <div class="pt-6 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <label for="is_public" class="flex items-center gap-3 cursor-pointer group select-none">
+                        <div class="relative">
+                            <input type="checkbox" id="is_public" class="peer sr-only" />
+                            <div class="w-10 h-6 bg-gray-200 rounded-full peer peer-checked:bg-purple-600 transition"></div>
+                            <div class="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition transform peer-checked:translate-x-4"></div>
+                        </div>
+                        <span class="text-sm font-bold text-gray-600 group-hover:text-purple-600 transition">이력서 공개하기</span>
+                    </label>
+
+                    <div class="flex gap-3 w-full sm:w-auto">
+                        <button type="button" onclick="history.back()" class="flex-1 sm:flex-none px-6 py-3 border border-gray-300 text-gray-600 font-bold rounded-xl hover:bg-gray-50 transition">
+                            취소
+                        </button>
+                        <button type="submit" class="flex-1 sm:flex-none px-8 py-3 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl shadow-md transition transform hover:-translate-y-0.5 flex items-center justify-center gap-2">
+                            <span>저장하기</span>
+                        </button>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById("profile_image").addEventListener("change", function (e) {
+        const file = e.target.files[0];
+        const preview = document.getElementById("profilePreview");
+
+        if (!file) {
+            preview.src = "";
+            preview.classList.add("hidden");
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function (event) {
+            preview.src = event.target.result;
+            preview.classList.remove("hidden");
+        };
+        reader.readAsDataURL(file);
+    });
+
+    async function saveResume(e) {
+        if(e) e.preventDefault();
+
+        const formEl = document.getElementById("newForm");
+
+        if (!formEl.checkValidity()) {
+            formEl.reportValidity();
+            return;
+        }
+
+        const form = new FormData(formEl);
+
+        const isPublicCheckbox = document.getElementById("is_public");
+        if (isPublicCheckbox.checked) {
+            form.set("is_public", "1"); // 체크됨 -> "1" 전송
+        } else {
+            form.delete("is_public");   // 체크 안 됨 -> 아예 보내지 않음
+        }
+
+        try {
+            const res = await fetch("/api/resumes", {
+                method: "POST",
+                body: form
+            });
+
+            const json = await res.json();
+
+            if (res.ok) {
+                alert("이력서가 성공적으로 저장되었습니다!");
+                location.href="/user/mypage";
+            } else {
+                alert("저장 실패: " + (json.message || "알 수 없는 오류가 발생했습니다."));
+            }
+        } catch (err) {
+            console.error(err);
+            alert("서버와 통신 중 오류가 발생했습니다.");
+        }
+    }
+
+    window.onload = function () {
+        const params = new URLSearchParams(window.location.search);
+
+        if (params.get("from") === "autogen") {
+            document.getElementById("resume_title").value = "자동 생성 이력서";
+            document.getElementById("summary").value = localStorage.getItem("auto_summary") || "";
+            document.getElementById("skills").value = localStorage.getItem("auto_skills") || "";
+            document.getElementById("projects").value = localStorage.getItem("auto_projects") || "";
+        }
+
+        if (params.get("from") === "draft") {
+            if (typeof loadDraftToForm === "function") {
+                loadDraftToForm();
+            }
+        }
+
+        document.getElementById("newForm").addEventListener("submit", saveResume);
+    };
+</script>
+
+{% endblock %}

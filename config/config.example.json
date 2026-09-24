@@ -1,0 +1,20 @@
+{
+  "development": {
+    "username": "YOUR_DB_USERNAME",
+    "password": "YOUR_DB_PASSWORD",
+    "database": "termproject",
+    "host": "127.0.0.1"
+  },
+  "test": {
+    "username": "YOUR_DB_USERNAME",
+    "password": "YOUR_DB_PASSWORD",
+    "database": "termproject",
+    "host": "127.0.0.1"
+  },
+  "production": {
+    "username": "YOUR_DB_USERNAME",
+    "password": "YOUR_DB_PASSWORD",
+    "database": "termproject",
+    "host": "127.0.0.1"
+  }
+}

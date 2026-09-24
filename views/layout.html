@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>취업 밸런스</title>
+
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css" />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Pretendard', 'sans-serif'],
+                    },
+                    colors: {
+                        purple: {
+                            50: '#f5f3ff',
+                            100: '#ede9fe',
+                            500: '#8b5cf6',
+                            600: '#7c3aed',
+                            700: '#6d28d9',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { font-family: 'Pretendard', sans-serif; }
+        .page-main {
+            min-height: calc(100vh - 4rem - 100px);
+        }
+    </style>
+</head>
+<body class="bg-[#F3F4F6] text-gray-900 antialiased flex flex-col min-h-screen">
+
+<header class="bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50 transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-16">
+
+            <a href="/home" class="flex items-center gap-2 group">
+                <div class="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center text-white shadow-sm group-hover:bg-purple-700 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                </div>
+                <span class="text-xl font-bold text-gray-900 tracking-tight group-hover:text-purple-700 transition-colors">취업 밸런스</span>
+            </a>
+
+            <nav class="flex items-center gap-1 sm:gap-4">
+                {% if user %}
+                <a href="/user/mypage" class="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-600 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-all">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 21v-2a4 4 0 0 0-3-3.87"></path><path d="M4 21v-2a4 4 0 0 1 3-3.87"></path><circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                    <span class="hidden sm:inline">마이페이지</span>
+                </a>
+
+                <a href="/auth/logout" class="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                    <span class="hidden sm:inline">로그아웃</span>
+                </a>
+                {% else %}
+                <a href="/" class="px-4 py-2 text-sm font-bold text-gray-600 hover:text-purple-600 transition-colors">로그인</a>
+                <a href="/join" class="px-4 py-2 text-sm font-bold text-white bg-purple-600 rounded-lg hover:bg-purple-700 shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5">회원가입</a>
+                {% endif %}
+            </nav>
+        </div>
+    </div>
+</header>
+
+<main class="page-main flex-grow">
+    <div class="page-container h-full">
+        {% block content %}{% endblock %}
+    </div>
+</main>
+
+<footer class="bg-white border-t border-gray-200 py-8 mt-auto">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div class="text-center md:text-left">
+            <span class="text-lg font-bold text-gray-800 flex items-center justify-center md:justify-start gap-2">
+                <span class="w-2 h-2 bg-purple-600 rounded-full"></span> 취업 밸런스
+            </span>
+            <p class="text-xs text-gray-500 mt-2">
+                취업 준비의 모든 것을 한 곳에서.<br>
+                이력서, 자기소개서, 그리고 커뮤니티.
+            </p>
+        </div>
+        <div class="text-xs text-gray-400 font-medium">
+            2025 WEB APPLICATION PROGRAMMING TermProject
+        </div>
+    </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Database configuration
+config/config.json
+
+# IDE
+.idea/
+*.iml
+
+# macOS
+.DS_Store
+__MACOSX/
+
+# Logs
+*.log
+npm-debug.log*
+
+# User uploads
+public/uploads/*
+!public/uploads/.gitkeep

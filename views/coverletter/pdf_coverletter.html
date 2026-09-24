@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Cover Letter PDF</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <style>
+        body {
+            background: #525659;
+            display: flex;
+            justify-content: center;
+            padding: 40px;
+            font-family: 'Pretendard', sans-serif;
+        }
+        #pdfArea {
+            width: 210mm;
+            min-height: 297mm; /* A4 Height */
+            background: white;
+            padding: 20mm;
+            box-shadow: 0 0 15px rgba(0,0,0,0.3);
+            box-sizing: border-box;
+        }
+        .cl-content {
+            white-space: pre-wrap;
+            word-break: break-word;
+            line-height: 1.8;
+            text-align: justify;
+        }
+    </style>
+</head>
+<body>
+
+<div id="pdfArea">
+    <div id="loading" class="text-center py-20 text-gray-400">데이터 로딩 중...</div>
+
+    <div id="contentWrap" class="hidden">
+        <div class="border-b-2 border-purple-600 pb-6 mb-8">
+            <h1 id="title" class="text-3xl font-extrabold text-gray-900 mb-2"></h1>
+            <p class="text-right text-gray-500 text-sm mt-4" id="date"></p>
+        </div>
+
+        <div class="space-y-10">
+            <div id="section-background"></div>
+            <div id="section-strengths"></div>
+            <div id="section-motivation"></div>
+            <div id="section-future"></div>
+        </div>
+
+        <div class="mt-20 text-center">
+            <p class="text-2xl font-serif text-gray-800 tracking-widest">지원자 &nbsp; <span id="userName" class="font-bold"></span></p>
+        </div>
+    </div>
+</div>
+
+<script>
+    const id = "{{ coverLetterId }}";
+
+    function createSection(title, content) {
+        if (!content) return "";
+        return `
+            <div>
+                <h2 class="text-xl font-bold text-purple-700 mb-3 flex items-center gap-2">
+                    <span class="w-2 h-2 bg-purple-600 rounded-full"></span> ${title}
+                </h2>
+                <div class="cl-content text-gray-800 text-sm">${content}</div>
+            </div>
+        `;
+    }
+
+    async function loadCL() {
+        try {
+            const res = await fetch(`/api/coverletters/${id}`);
+            const data = await res.json();
+
+            if (!res.ok) {
+                alert("정보를 불러올 수 없습니다.");
+                return;
+            }
+
+            // 데이터 매핑
+            const map = {};
+            data.sections.forEach(s => {
+                map[s.section_type] = s.content;
+            });
+
+            // 화면 그리기
+            document.getElementById("loading").classList.add("hidden");
+            document.getElementById("contentWrap").classList.remove("hidden");
+
+            document.getElementById("title").innerText = data.coverLetter.title;
+            // 날짜 포맷 (YYYY. MM. DD)
+            const dateObj = new Date(data.coverLetter.created_at);
+            const dateStr = `${dateObj.getFullYear()}. ${dateObj.getMonth() + 1}. ${dateObj.getDate()}`;
+            document.getElementById("date").innerText = `작성일: ${dateStr}`;
+
+            // 유저 닉네임 (API에서 보내준다면 사용, 없으면 'OOO' 처리)
+            // 여기서는 user 정보가 API에 포함되어 있다고 가정하거나, 없으면 공란
+            document.getElementById("userName").innerText = data.user ? data.user.name : "O O O";
+
+            document.getElementById("section-background").innerHTML = createSection("성장배경", map.background);
+            document.getElementById("section-strengths").innerHTML = createSection("성격의 장단점", map.strengths);
+            document.getElementById("section-motivation").innerHTML = createSection("지원동기", map.motivation);
+            document.getElementById("section-future").innerHTML = createSection("입사 후 포부", map.future);
+
+            // 렌더링 완료 후 PDF 생성
+            setTimeout(() => generatePDF(), 500);
+
+        } catch (e) {
+            console.error(e);
+            document.getElementById("loading").innerText = "오류 발생";
+        }
+    }
+
+    async function generatePDF() {
+        const { jsPDF } = window.jspdf;
+        const area = document.getElementById("pdfArea");
+
+        // 고해상도 캡처를 위해 scale 증가
+        const canvas = await html2canvas(area, { scale: 2, useCORS: true });
+        const imgData = canvas.toDataURL("image/png");
+
+        // A4 크기 계산 (mm)
+        const imgWidth = 210;
+        const pageHeight = 297;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+        let heightLeft = imgHeight;
+        let position = 0;
+
+        const pdf = new jsPDF("p", "mm", "a4");
+
+        // 첫 페이지
+        pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+
+        // 내용이 길어지면 페이지 추가
+        while (heightLeft > 0) {
+            position = heightLeft - imgHeight;
+            pdf.addPage();
+            pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
+        }
+
+        pdf.save(`coverletter_${id}.pdf`);
+        window.close();
+    }
+
+    loadCL();
+</script>
+
+</body>
+</html>
